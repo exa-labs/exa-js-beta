@@ -1,4 +1,4 @@
-import fetch, { Headers } from 'cross-fetch';
+import fetch, { Headers } from "cross-fetch";
 
 /**
  * Search options for performing a search query.
@@ -36,7 +36,7 @@ export type BaseSearchOptions = {
 export type RegularSearchOptions = BaseSearchOptions & {
   useAutoprompt?: boolean;
   type?: string;
-}
+};
 
 /**
  * Options for finding similar links.
@@ -55,7 +55,7 @@ export type RegularSearchOptions = BaseSearchOptions & {
  */
 export type FindSimilarOptions = BaseSearchOptions & {
   excludeSourceDomain?: boolean;
-}
+};
 
 /**
  * Search options for performing a search query.
@@ -63,12 +63,20 @@ export type FindSimilarOptions = BaseSearchOptions & {
  * @property {TextContentsOptions | boolean} [text] - Options for retrieving text contents.
  * @property {HighlightsContentsOptions | boolean} [highlights] - Options for retrieving highlights.
  * @property {SummaryContentsOptions | boolean} [summary] - Options for retrieving summary.
+ * @property {LivecrawlOptions} [livecrawl] - Livecrawl options for contents, default is "never" for neural/auto search, "fallback" for keyword search.
  */
 export type ContentsOptions = {
   text?: TextContentsOptions | true;
   highlights?: HighlightsContentsOptions | true;
   summary?: SummaryContentsOptions | true;
+  livecrawl?: LivecrawlOptions;
 };
+
+/**
+ * Options for livecrawling contents
+ * @typedef {string} LivecrawlOptions
+ */
+export type LivecrawlOptions = "never" | "fallback" | "always";
 
 /**
  * Options for retrieving text from page.
@@ -79,7 +87,7 @@ export type ContentsOptions = {
 export type TextContentsOptions = {
   maxCharacters?: number;
   includeHtmlTags?: boolean;
-}
+};
 
 /**
  * Options for retrieving highlights from page.
@@ -92,7 +100,7 @@ export type HighlightsContentsOptions = {
   query?: string;
   numSentences?: number;
   highlightsPerUrl?: number;
-}
+};
 
 /**
  * Options for retrieving summary from page.
@@ -101,7 +109,7 @@ export type HighlightsContentsOptions = {
  */
 export type SummaryContentsOptions = {
   query?: string;
-}
+};
 
 /**
  * @typedef {Object} TextResponse
@@ -114,7 +122,10 @@ export type TextResponse = { text: string };
  * @property {string[]} highlights - The highlights as an array of strings.
  * @property {number[]} highlightScores - The corresponding scores as an array of floats, 0 to 1
  */
-export type HighlightsResponse = { highlights: string[], highlightScores: number[] };
+export type HighlightsResponse = {
+  highlights: string[];
+  highlightScores: number[];
+};
 
 /**
  * @typedef {Object} SummaryResponse
@@ -130,10 +141,12 @@ export type Default<T extends {}, U> = [keyof T] extends [never] ? U : T;
  *
  * @template T - A type extending from 'ContentsOptions'.
  */
-export type ContentsResultComponent<T extends ContentsOptions> =
-  Default<(T['text'] extends (object | true) ? TextResponse : {}) &
-    (T['highlights'] extends (object | true) ? HighlightsResponse : {}) &
-    (T['summary'] extends (object | true) ? SummaryResponse : {}), TextResponse>
+export type ContentsResultComponent<T extends ContentsOptions> = Default<
+  (T["text"] extends object | true ? TextResponse : {}) &
+    (T["highlights"] extends object | true ? HighlightsResponse : {}) &
+    (T["summary"] extends object | true ? SummaryResponse : {}),
+  TextResponse
+>;
 
 /**
  * Represents a search result object.
@@ -163,7 +176,7 @@ export type SearchResult<T extends ContentsOptions = {}> = {
 export type SearchResponse<T extends ContentsOptions = {}> = {
   results: SearchResult<T>[];
   autopromptString?: string;
-}
+};
 
 /**
  * The Exa class encapsulates the API's endpoints.
@@ -177,15 +190,14 @@ class Exa {
    * @param {string} apiKey - The API key for authentication.
    * @param {string} [baseURL] - The base URL of the Exa API.
    */
-  constructor(
-    apiKey?: string,
-    baseURL: string = "https://api.exa.ai"
-  ) {
+  constructor(apiKey?: string, baseURL: string = "https://api.exa.ai") {
     this.baseURL = baseURL;
     if (!apiKey) {
       apiKey = process.env.EXASEARCH_API_KEY;
       if (!apiKey) {
-        throw new Error("API key must be provided as an argument or as an environment variable (EXASEARCH_API_KEY)");
+        throw new Error(
+          "API key must be provided as an argument or as an environment variable (EXASEARCH_API_KEY)"
+        );
       }
     }
     this.headers = new Headers({
@@ -229,26 +241,35 @@ class Exa {
    * @param {SearchOptions} [options] - Additional search options.
    * @returns {Promise<SearchResponse>} A list of relevant search results.
    */
-  async search(query: string, options?: RegularSearchOptions): Promise<SearchResponse> {
-    return await this.request("/search", 'POST', { query, ...options });
+  async search(
+    query: string,
+    options?: RegularSearchOptions
+  ): Promise<SearchResponse> {
+    return await this.request("/search", "POST", { query, ...options });
   }
 
   /**
    * Performs a search with a Exa prompt-engineered query and returns the contents of the documents.
    * @param {string} query - The query string.
-   * @param {SearchOptions} [options] - Additional search options.
+   * @param {RegularSearchOptions & ContentsOptions} [options] - Additional search options.
    * @returns {Promise<SearchResponse>} A list of relevant search results.
    */
-  async searchAndContents<T extends ContentsOptions>(query: string, options?: RegularSearchOptions & T): Promise<SearchResponse<T>> {
+  async searchAndContents<T extends ContentsOptions>(
+    query: string,
+    options?: RegularSearchOptions & T
+  ): Promise<SearchResponse<T>> {
     const { text, highlights, summary, ...rest } = options || {};
-    return await this.request("/search", 'POST', {
+    return await this.request("/search", "POST", {
       query,
-      contents: (!text && !highlights && !summary) ? { text: true } : {
-        ...(text ? { text } : {}),
-        ...(highlights ? { highlights } : {}),
-        ...(summary ? { summary } : {})
-      },
-      ...rest
+      contents:
+        !text && !highlights && !summary
+          ? { text: true }
+          : {
+              ...(text ? { text } : {}),
+              ...(highlights ? { highlights } : {}),
+              ...(summary ? { summary } : {}),
+            },
+      ...rest,
     });
   }
 
@@ -262,25 +283,31 @@ class Exa {
     url: string,
     options?: FindSimilarOptions
   ): Promise<SearchResponse> {
-    return await this.request("/findSimilar", 'POST', { url, ...options });
+    return await this.request("/findSimilar", "POST", { url, ...options });
   }
 
   /**
    * Finds similar links to the provided URL and returns the contents of the documents.
    * @param {string} url - The URL for which to find similar links.
-   * @param {FindSimilarOptions} [options] - Additional options for finding similar links.
+   * @param {FindSimilarOptions & ContentsOptions} [options] - Additional options for finding similar links.
    * @returns {Promise<SearchResponse>} A list of similar search results.
    */
-  async findSimilarAndContents<T extends ContentsOptions>(url: string, options?: FindSimilarOptions & T): Promise<SearchResponse<T>> {
+  async findSimilarAndContents<T extends ContentsOptions>(
+    url: string,
+    options?: FindSimilarOptions & T
+  ): Promise<SearchResponse<T>> {
     const { text, highlights, summary, ...rest } = options || {};
-    return await this.request("/findSimilar", 'POST', {
+    return await this.request("/findSimilar", "POST", {
       url,
-      contents: (!text && !highlights && !summary) ? { text: true } : {
-        ...(text ? { text } : {}),
-        ...(highlights ? { highlights } : {}),
-        ...(summary ? { summary } : {})
-      },
-      ...rest
+      contents:
+        !text && !highlights && !summary
+          ? { text: true }
+          : {
+              ...(text ? { text } : {}),
+              ...(highlights ? { highlights } : {}),
+              ...(summary ? { summary } : {}),
+            },
+      ...rest,
     });
   }
 
@@ -290,7 +317,10 @@ class Exa {
    * @param {ContentsOptions} [options] - Additional options for retrieving document contents.
    * @returns {Promise<GetContentsResponse>} A list of document contents.
    */
-  async getContents<T extends ContentsOptions>(ids: string | string[] | SearchResult[], options?: T): Promise<SearchResponse<T>> {
+  async getContents<T extends ContentsOptions>(
+    ids: string | string[] | SearchResult[],
+    options?: T
+  ): Promise<SearchResponse<T>> {
     if (ids.length === 0) {
       throw new Error("Must provide at least one ID");
     }
@@ -302,7 +332,10 @@ class Exa {
     } else {
       requestIds = (ids as SearchResult[]).map((result) => result.id);
     }
-    return await this.request(`/contents`, 'POST', { ids: requestIds, ...options, });
+    return await this.request(`/contents`, "POST", {
+      ids: requestIds,
+      ...options,
+    });
   }
 }
 
