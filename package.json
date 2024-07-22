@@ -1,7 +1,7 @@
 {
-  "name": "exa-js",
-  "version": "1.0.14",
-  "description": "Exa SDK for Node.js and the browser",
+  "name": "@exalabs/exa-js-beta",
+  "version": "1.0.14-beta.0",
+  "description": "[Beta] Exa SDK for Node.js and the browser",
   "publishConfig": {
     "access": "public"
   },
@@ -44,7 +44,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/exa-labs/exa-js.git"
+    "url": "git+https://github.com/exa-labs/exa-js-beta.git"
   },
   "keywords": [
     "exa",
@@ -61,5 +61,5 @@
   "bugs": {
     "url": "https://github.com/exa-labs/exa-js/issues"
   },
-  "homepage": "https://github.com/exa-labs/exa-js#readme"
+  "homepage": "https://github.com/exa-labs/exa-js-private-beta#readme"
 }
