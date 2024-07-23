@@ -1,5 +1,5 @@
 {
-  "name": "@exalabs/exa-js-beta",
+  "name": "@exa-labs/exa-js-beta",
   "version": "1.0.14-beta.1",
   "description": "[Beta] Exa SDK for Node.js and the browser",
   "publishConfig": {

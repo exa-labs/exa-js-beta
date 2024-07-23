@@ -5,7 +5,7 @@ For the official, stable version of Exa's Javascript SDK, please go to https://w
 ## Installation
 
 ```
-npm install @exalabs/exa-js-private-beta
+npm install @exa-labs/exa-js-private-beta
 ```
 
 ## Initialization
