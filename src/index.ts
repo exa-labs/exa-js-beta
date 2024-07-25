@@ -70,6 +70,7 @@ export type ContentsOptions = {
   highlights?: HighlightsContentsOptions | true;
   summary?: SummaryContentsOptions | true;
   livecrawl?: LivecrawlOptions;
+  filterEmptyResults?: boolean;
 };
 
 /**

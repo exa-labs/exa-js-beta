@@ -61,6 +61,7 @@ const searchAndCustomContentsResults = await exa.searchAndContents(
       query: "This is the highlight query:",
     },
     livecrawl: "always", // options are: 'always', 'fallback', 'never'
+    filterEmptyResults: false, // boolean; default true
   }
 );
 
@@ -80,6 +81,7 @@ const similarWithContentsResults = await exa.findSimilarAndContents(
     text: true,
     highlights: true,
     livecrawl: "always", // options are: 'always', 'fallback', 'never'
+    filterEmptyResults: false, // boolean; default true
   }
 );
 
@@ -100,6 +102,7 @@ const customContentsResults = await exa.getContents(["ids"], {
     query: "This is the highlight query:",
   },
   livecrawl: "always", // options are: 'always', 'fallback', 'never'
+  filterEmptyResults: false, // boolean; default false
 });
 ```
 
